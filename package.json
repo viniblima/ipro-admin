@@ -1,0 +1,44 @@
+{
+  "name": "ecommerce-admin",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "xo",
+    "lint": "xo",
+    "format": "xo --fix",
+    "start": "node ./bin/start.js",
+    "dev": "nodemon ./bin/start.js",
+    "migrate": "node ./bin/migrate.js",
+    "migrate:create": "migrate create --migrations-dir='./src/migrations'"
+  },
+  "dependencies": {
+    "bcrypt": "^3.0.6",
+    "child_process": "^1.0.2",
+    "client-sessions": "^0.8.0",
+    "db-migrate": "^0.11.6",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "g": "^2.0.1",
+    "helmet": "^3.16.0",
+    "jsonwebtoken": "^8.5.1",
+    "migrate": "^1.6.2",
+    "morgan": "^1.9.1",
+    "pg": "^7.9.0",
+    "sequelize": "^5.21.4",
+    "sql-template-strings": "^2.2.2",
+    "util": "^0.12.1",
+    "uuid": "^3.3.2"
+  },
+  "devDependencies": {
+    "jsonwebtoken": "^8.5.1",
+    "nodemon": "^1.18.11",
+    "xo": "^0.24.0"
+  },
+  "xo": {
+    "prettier": true,
+    "space": true
+  },
+  "author": "Vinícius Branco",
+  "license": "ISC"
+}
