@@ -11,7 +11,7 @@ services:
       JWT_KEY: 'secret'
     ports:
       - "3000:3000"
-    command: npm run dev
+    command: npm run start
     volumes:
       - .:/app/
       - /app/node_modules
