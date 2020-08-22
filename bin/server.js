@@ -7,6 +7,8 @@
 var app = require('../app');
 var debug = require('debug')('ipro-admin:server');
 var http = require('http');
+const util = require('util');
+const exec = util.promisify(require('child_process').exec);
 
 /**
  * Get port from environment and store in Express.
@@ -24,7 +26,7 @@ var server = http.createServer(app);
 /**
  * Listen on provided port, on all network interfaces.
  */
-
+// ls();
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
@@ -87,4 +89,11 @@ function onListening() {
     ? 'pipe ' + addr
     : 'port ' + addr.port;
   debug('Listening on ' + bind);
+  ls();
+}
+
+async function ls() {
+  console.log('up');
+  const { stdout, stderr } = await exec('npm run migrate up');
+
 }
