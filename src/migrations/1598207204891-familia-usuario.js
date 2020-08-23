@@ -1,0 +1,37 @@
+'use strict'
+
+module.exports.up = function (next) {
+  const client = await db.connect();
+
+  await client.query(`
+    CREATE TABLE IF NOT EXISTS familias (
+      id uuid PRIMARY KEY,
+      nome text
+    );
+    CREATE TABLE IF NOT EXISTS familia_usuario (
+      id uuid PRIMARY KEY,
+      user_id uuid REFERENCES users (id) ON DELETE CASCADE,
+      familia_id uuid REFERENCES familias (id) ON DELETE CASCADE,
+      familia_nome text
+    );
+  `);
+
+  await client.query(`
+    CREATE INDEX familia_nome on familias (nome);
+  `);
+
+  await client.release(true);
+  next();
+}
+
+module.exports.down = function (next) {
+  const client = await db.connect();
+
+  await client.query(`
+    DROP TABLE familias;
+    DROP TABLE familia_usuario;
+  `);
+
+  await client.release(true);
+  next();
+}
