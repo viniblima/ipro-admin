@@ -1,6 +1,6 @@
-'use strict'
+const db = require('../persistence/db');
 
-module.exports.up = function (next) {
+module.exports.up = async function (next) {
   const client = await db.connect();
 
   await client.query(`
@@ -12,7 +12,7 @@ module.exports.up = function (next) {
       id uuid PRIMARY KEY,
       user_id uuid REFERENCES users (id) ON DELETE CASCADE,
       familia_id uuid REFERENCES familias (id) ON DELETE CASCADE,
-      familia_nome text
+      familia_nome text REFERENCES familias (nome) ON DELETE CASCADE
     );
   `);
 
@@ -24,7 +24,7 @@ module.exports.up = function (next) {
   next();
 }
 
-module.exports.down = function (next) {
+module.exports.down = async function (next) {
   const client = await db.connect();
 
   await client.query(`

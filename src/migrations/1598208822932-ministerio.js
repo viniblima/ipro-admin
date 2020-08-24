@@ -1,6 +1,6 @@
-'use strict'
+const db = require('../persistence/db');
 
-module.exports.up = function (next) {
+module.exports.up = async function (next) {
   const client = await db.connect();
 
   await client.query(`
@@ -43,7 +43,7 @@ module.exports.up = function (next) {
   next();
 }
 
-module.exports.down = function (next) {
+module.exports.down = async function (next) {
   const client = await db.connect();
 
   await client.query(`

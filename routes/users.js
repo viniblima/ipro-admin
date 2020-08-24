@@ -2,13 +2,12 @@ var express = require('express');
 var router = express.Router();
 const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
+var bcrypt = require('bcrypt');
 const User = require('../src/persistence/users');
 
-/* GET users listing. */
-router.get('/', function (req, res, next) {
-  return res.status(200).json({ message: 'testeasdasdasas' });
-});
+const authService = require('../src/services/auth-service');
 
+// Função de criação de usuário
 router.post('/signup', [
   check('email').isEmail(),
   check('nome').not().isEmpty(),
@@ -20,7 +19,7 @@ router.post('/signup', [
   }
 
   try {
-    const { email, password, nome } = req.body;
+    const { email, password, nome, ministerios, cursos, familia } = req.body;
     if (!email || !password || !nome) {
       return res
         .status(400)
@@ -32,6 +31,8 @@ router.post('/signup', [
     if (!user) {
       return res.status(400).json({ message: 'User already exists' });
     }
+
+
 
     usuario['token'] = jwt.sign(user, process.env.JWT_KEY, {
       expiresIn: 36000, // 10 horas
@@ -48,6 +49,102 @@ router.post('/signup', [
   } catch (error) {
     console.error(
       `createUser({ email: ${req.body.email} }) >> Error: ${error.stack}`
+    );
+    res.status(500).json();
+  }
+});
+
+// Função de login
+router.post('/login', async (req, res) => {
+  try {
+
+    const { email, password } = req.body;
+    if (!email || !password) {
+      return res
+        .status(400)
+        .json({ message: 'email and password must be provided' });
+    }
+
+    const usuario = {}
+
+    const user = await User.find(email);
+
+    if (!user) {
+      return res.status(400).json({ message: 'Email ou senha inválido' });
+    }
+    else {
+      bcrypt.compare(password, user.password, (err, result) => {
+        if (err) {
+          return res.status(400).json({ message: 'Email ou senha inválido' });
+        }
+        if (result) {
+          if (!process.env.JWT_KEY) {
+            return res.status(500).json({ message: 'Faltando variável de ambiente JWT' });
+          }
+          const token = jwt.sign(user, process.env.JWT_KEY, {
+            expiresIn: 36000, // 10 horas
+          });
+
+          usuario['usuario'] = user;
+
+          usuario['token'] = token;
+
+          var decode = jwt.decode(token);
+
+          var date = new Date(decode.exp * 1000);
+
+          usuario['expires'] = date;
+          return res.status(200).json(usuario);
+        }
+        return res.status(400).json({ message: 'Email ou senha inválido' });
+      });
+
+    }
+
+  } catch (error) {
+    console.error(
+      `Login({ email: ${req.body.email} }) >> Error: ${error.stack}`
+    );
+    res.status(500).json();
+  }
+});
+
+router.post('/familia', [
+  check('nome').not().isEmpty(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(422).json({ errors: errors.array() });
+  }
+
+  // Validação do token
+  const token = req.headers.authorization.split(' ')[1];
+
+  const decode = jwt.verify(token, process.env.JWT_KEY);
+
+  if (!decode || !req.headers.authorization) {
+    res.status(403).json({});
+
+  }
+
+  /**
+   * Tentativa de criação de família
+   * Se houver erro, retorna 400
+   * 
+   */
+  try {
+    const { nome } = req.body;
+    const query = await User.criarFamilia(nome);
+
+    if (!query) {
+      return res.status(400).json({ message: 'Erro ao criar família' });
+    }
+
+    return res.status(200).json(query);
+
+  } catch (error) {
+    console.error(
+      `criarFamilia >> Error: ${error.stack}`
     );
     res.status(500).json();
   }
