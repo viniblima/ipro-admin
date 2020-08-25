@@ -51,7 +51,7 @@ router.post('/signup', [
     usuario['ministerio']['cursos'] = [];
     if (cursos) {
       for (const curso of cursos) {
-        const auxCurso = await Ministerio.relacionarComCurso(user['id'], curso);
+        const auxCurso = await Ministerio.relacionarComCurso(user['id'], curso.id, curso.nome);
 
         if (!auxCurso) {
           return res.status(400).json({ message: 'Não foi possível criar relação com curso' });
