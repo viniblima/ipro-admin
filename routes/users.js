@@ -4,6 +4,7 @@ const { check, validationResult } = require('express-validator');
 const jwt = require('jsonwebtoken');
 var bcrypt = require('bcrypt');
 const User = require('../src/persistence/users');
+const Ministerio = require('../src/persistence/ministerio');
 
 const authService = require('../src/services/auth-service');
 
@@ -32,6 +33,44 @@ router.post('/signup', [
       return res.status(400).json({ message: 'User already exists' });
     }
 
+    usuario['ministerio'] = {};
+
+    usuario['ministerio']['ministerios'] = [];
+    if (ministerios) {
+      for (const min of ministerios) {
+
+        const auxMin = await Ministerio.relacionarComMinisterio(user['id'], min.id, min.nome);
+        if (!auxMin) {
+          return res.status(400).json({ message: 'Não foi possível criar relação com ministério' });
+        }
+
+        usuario['ministerio']['ministerios'].push(auxMin);
+      }
+    }
+
+    usuario['ministerio']['cursos'] = [];
+    if (cursos) {
+      for (const curso of cursos) {
+        const auxCurso = await Ministerio.relacionarComCurso(user['id'], curso);
+
+        if (!auxCurso) {
+          return res.status(400).json({ message: 'Não foi possível criar relação com curso' });
+        }
+
+        usuario['ministerio']['cursos'].push(auxCurso);
+      }
+    }
+
+    usuario['familia'] = {};
+    if (familia) {
+      const auxFamilia = await User.relacionarComFamilia(user['id'], familia.id, familia.nome);
+
+      if (!auxFamilia) {
+        return res.status(400).json({ message: 'Não foi possível criar relação com família' });
+      }
+
+      usuario['familia'] = auxFamilia;
+    }
 
 
     usuario['token'] = jwt.sign(user, process.env.JWT_KEY, {
@@ -123,8 +162,7 @@ router.post('/familia', [
   const decode = jwt.verify(token, process.env.JWT_KEY);
 
   if (!decode || !req.headers.authorization) {
-    res.status(403).json({});
-
+    return res.status(403).json({});
   }
 
   /**

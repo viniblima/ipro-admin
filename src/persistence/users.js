@@ -23,12 +23,20 @@ module.exports = {
             throw error;
         }
     },
+
+    /**
+     * Função para inserir um membro numa família
+     * 
+     * @param {uuid} user_id ID do usuário
+     * @param {uuid} familia_id ID da família
+     * @param {string} nome Nome da família 
+     */
     async relacionarComFamilia(user_id, familia_id, nome) {
         try {
             const { rows } = await db.query(sql`
             INSERT INTO familia_usuario (id, user_id, familia_id, familia_nome)
                 VALUES (${uuidv4()}, ${user_id}, ${familia_id}, ${nome})
-                RETURNING id, email, nome;
+                RETURNING id, user_id, familia_id, familia_nome;
             `);
 
             const [relation] = rows;
@@ -42,7 +50,7 @@ module.exports = {
             const { rows } = await db.query(sql`
             INSERT INTO cursos_usuario (id, user_id, curso_id, curso_nome)
                 VALUES (${uuidv4()}, ${user_id}, ${curso_id}, ${curso_nome})
-                RETURNING id, email, nome;
+                RETURNING id, user_id, curso_id, curso_nome;
             `);
 
             const [relation] = rows;

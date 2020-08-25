@@ -12,7 +12,7 @@ module.exports.up = async function (next) {
       id uuid PRIMARY KEY,
       user_id uuid REFERENCES users (id) ON DELETE CASCADE,
       familia_id uuid REFERENCES familias (id) ON DELETE CASCADE,
-      familia_nome text REFERENCES familias (nome) ON DELETE CASCADE
+      familia_nome text
     );
   `);
 
@@ -28,8 +28,8 @@ module.exports.down = async function (next) {
   const client = await db.connect();
 
   await client.query(`
-    DROP TABLE familias;
-    DROP TABLE familia_usuario;
+    DROP TABLE familias cascade;
+    DROP TABLE familia_usuario cascade;
   `);
 
   await client.release(true);

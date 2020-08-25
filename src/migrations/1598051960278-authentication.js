@@ -30,8 +30,8 @@ module.exports.down = async function(next) {
   const client = await db.connect();
 
   await client.query(`
-  DROP TABLE sessions;
-  DROP TABLE users;
+  DROP TABLE sessions cascade;
+  DROP TABLE users cascade;
   `);
 
   await client.release(true);

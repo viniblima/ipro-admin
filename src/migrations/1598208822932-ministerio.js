@@ -12,7 +12,8 @@ module.exports.up = async function (next) {
     CREATE TABLE IF NOT EXISTS ministerio_usuario (
       id uuid PRIMARY KEY,
       user_id uuid REFERENCES users (id) ON DELETE CASCADE,
-      ministerio_nome text REFERENCES ministerios (nome) ON DELETE CASCADE
+      ministerio_id uuid REFERENCES ministerios (id) ON DELETE CASCADE,
+      ministerio_nome text
     );
 
     CREATE TABLE IF NOT EXISTS cursos (
@@ -24,7 +25,7 @@ module.exports.up = async function (next) {
       id uuid PRIMARY KEY,
       user_id uuid REFERENCES users (id) ON DELETE CASCADE,
       curso_id uuid REFERENCES cursos (id) ON DELETE CASCADE,
-      curso_nome text REFERENCES cursos (nome) ON DELETE CASCADE
+      curso_nome text
     );
 
     CREATE TABLE IF NOT EXISTS cursos_ministerio (
@@ -47,11 +48,11 @@ module.exports.down = async function (next) {
   const client = await db.connect();
 
   await client.query(`
-    DROP TABLE ministerios;
-    DROP TABLE ministerio_usuario;
-    DROP TABLE cursos;
-    DROP TABLE cursos_usuario;
-    DROP TABLE cursos_ministerio;
+    DROP TABLE ministerios cascade;
+    DROP TABLE ministerio_usuario cascade;
+    DROP TABLE cursos cascade;
+    DROP TABLE cursos_usuario cascade;
+    DROP TABLE cursos_ministerio cascade;
   `);
 
   await client.release(true);
