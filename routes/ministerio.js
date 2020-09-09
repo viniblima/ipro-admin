@@ -17,7 +17,16 @@ router.post('/ministerio', [
     // Validação do token
     const token = req.headers.authorization.split(' ')[1];
 
-    const decode = jwt.verify(token, process.env.JWT_KEY);
+    // var dateNow = new Date();
+    var decode = false;
+    jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
+        if (err) {
+            console.log(err);
+        } else {
+            decode = true;
+        }
+
+    });
 
     if (!decode || !req.headers.authorization || !token) {
         return res.status(403).json({});
@@ -38,8 +47,47 @@ router.post('/ministerio', [
         console.error(
             `criarFamilia >> Error: ${error.stack}`
         );
+        return res.status(400).json({ message: 'Erro ao criar ministério' });
+    }
+});
+
+router.get('/ministerio', async (req, res) => {
+
+    try {
+
+        const query = await Ministerio.pegarMinisterios();
+
+        if (!query) {
+            return res.status(400).json({ message: 'Erro ao pegar ministérios' });
+        }
+
+        return res.status(200).json(query);
+
+    } catch (error) {
+        console.error(
+            `criarFamilia >> Error: ${error.stack}`
+        );
         throw error;
-        // return res.status(500).json();
+    }
+});
+
+router.get('/curso', async (req, res) => {
+
+    try {
+
+        const query = await Ministerio.pegarCursos();
+
+        if (!query) {
+            return res.status(400).json({ message: 'Erro ao pegar cursos' });
+        }
+
+        return res.status(200).json(query);
+
+    } catch (error) {
+        console.error(
+            `criarFamilia >> Error: ${error.stack}`
+        );
+        throw error;
     }
 });
 
@@ -55,7 +103,14 @@ router.post('/curso', [
     // Validação do token
     const token = req.headers.authorization.split(' ')[1];
 
-    const decode = jwt.verify(token, process.env.JWT_KEY);
+    var decode = false;
+    jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
+        if (err) {
+            console.log(err);
+        } else {
+            decode = true;
+        }
+    });
 
     if (!decode || !req.headers.authorization || !token) {
         return res.status(403).json({});

@@ -159,7 +159,14 @@ router.post('/familia', [
   // Validação do token
   const token = req.headers.authorization.split(' ')[1];
 
-  const decode = jwt.verify(token, process.env.JWT_KEY);
+  var decode = false;
+  jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
+    if (err) {
+      console.log(err);
+    } else {
+      decode = true;
+    }
+  });
 
   if (!decode || !req.headers.authorization) {
     return res.status(403).json({});

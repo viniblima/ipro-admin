@@ -28,6 +28,35 @@ module.exports = {
     },
 
     /**
+     * Função para pegar todos os ministérios
+     */
+    async pegarMinisterios() {
+        try {
+
+            const { rows } = await db.query(sql`
+            SELECT * FROM ministerios`);
+
+            return rows;
+        } catch (error) {
+
+            throw error;
+        }
+    },
+
+
+    async pegarCursos() {
+        try {
+
+            const { rows } = await db.query(sql`
+            SELECT * FROM cursos`);
+
+            return rows;
+        } catch (error) {
+
+            throw error;
+        }
+    },
+    /**
      * Função para criação de relação entre usuário e ministério
      * 
      * @param {uuid} user_id ID do usuário
