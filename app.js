@@ -25,7 +25,7 @@ app.use('/ministerios', ministeriosRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
-  return res.status(400).json({ message: 'post' });
+  return res.status(404).json({ message: 'post' });
 });
 
 // error handler
