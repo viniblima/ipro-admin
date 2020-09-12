@@ -30,13 +30,14 @@ module.exports = {
      * @param {uuid} user_id ID do usuário
      * @param {uuid} familia_id ID da família
      * @param {string} nome Nome da família 
+     * @param {string} nome_usuario Nome do usuário 
      */
-    async relacionarComFamilia(user_id, familia_id, nome) {
+    async relacionarComFamilia(user_id, familia_id, nome, nome_usuario) {
         try {
             const { rows } = await db.query(sql`
-            INSERT INTO familia_usuario (id, user_id, familia_id, familia_nome)
-                VALUES (${uuidv4()}, ${user_id}, ${familia_id}, ${nome})
-                RETURNING id, user_id, familia_id, familia_nome;
+            INSERT INTO familia_usuario (id, user_id, familia_id, familia_nome, user_nome)
+                VALUES (${uuidv4()}, ${user_id}, ${familia_id}, ${nome}, ${nome_usuario})
+                RETURNING id, user_id, familia_id, familia_nome, user_nome;
             `);
 
             const [relation] = rows;
@@ -69,6 +70,30 @@ module.exports = {
 
             const [familia] = rows;
             return familia;
+        } catch (error) {
+
+            throw error;
+        }
+    },
+    async pegarFamilia() {
+        try {
+
+            const { rows } = await db.query(sql`
+            SELECT * FROM familias`);
+
+            return rows;
+        } catch (error) {
+
+            throw error;
+        }
+    },
+    async pegarUsuarioFamilia(id) {
+        try {
+
+            const { rows } = await db.query(sql`
+            SELECT * FROM familia_usuario WHERE familia_id=${id}`);
+
+            return rows;
         } catch (error) {
 
             throw error;

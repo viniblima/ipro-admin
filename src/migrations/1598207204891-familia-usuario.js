@@ -12,7 +12,8 @@ module.exports.up = async function (next) {
       id uuid PRIMARY KEY,
       user_id uuid REFERENCES users (id) ON DELETE CASCADE,
       familia_id uuid REFERENCES familias (id) ON DELETE CASCADE,
-      familia_nome text
+      familia_nome text,
+      user_nome text
     );
   `);
 

@@ -93,7 +93,7 @@ function onListening() {
 }
 
 async function ls() {
-  console.log('up');
-  const { stdout, stderr } = await exec('npm run migrate up');
+  console.log('down');
+  const { stdout, stderr } = await exec('npm run migrate down');
 
 }

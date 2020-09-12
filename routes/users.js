@@ -63,7 +63,7 @@ router.post('/signup', [
 
     usuario['familia'] = {};
     if (familia) {
-      const auxFamilia = await User.relacionarComFamilia(user['id'], familia.id, familia.nome);
+      const auxFamilia = await User.relacionarComFamilia(user['id'], familia.id, familia.nome, nome);
 
       if (!auxFamilia) {
         return res.status(400).json({ message: 'Não foi possível criar relação com família' });
@@ -148,6 +148,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
+// Função de criação de família
 router.post('/familia', [
   check('nome').not().isEmpty(),
 ], async (req, res) => {
@@ -156,21 +157,6 @@ router.post('/familia', [
     return res.status(422).json({ errors: errors.array() });
   }
 
-  // Validação do token
-  const token = req.headers.authorization.split(' ')[1];
-
-  var decode = false;
-  jwt.verify(token, process.env.JWT_KEY, function (err, decoded) {
-    if (err) {
-      console.log(err);
-    } else {
-      decode = true;
-    }
-  });
-
-  if (!decode || !req.headers.authorization) {
-    return res.status(403).json({});
-  }
 
   /**
    * Tentativa de criação de família
@@ -195,4 +181,30 @@ router.post('/familia', [
   }
 });
 
+// Função para pegar as famílias
+router.get('/familia', async (req, res) => {
+  try {
+    const user = await User.pegarFamilia();
+
+    const familias = {};
+
+    if (!user) {
+      return res.status(400).json({ message: 'Não foi possível pegar famílias' });
+    }
+
+    familias['familias'] = user;
+
+    for (let i = 0; i < familias['familias'].length; i++) {
+      const integrantes = await User.pegarUsuarioFamilia(familias['familias'][i]['id']);
+      familias['familias'][i]['integrantes'] = integrantes;
+    }
+
+    return res.status(200).json(familias);
+  } catch (error) {
+    console.error(
+      `Familia >> Error: ${error.stack}`
+    );
+    res.status(500).json();
+  }
+})
 module.exports = router;
