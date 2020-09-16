@@ -181,6 +181,34 @@ router.post('/familia', [
   }
 });
 
+router.post('/refresh', [
+
+  check('token').not().isEmpty(),
+
+], async (req, res, next) => {
+
+  try {
+    const token = req.body.token || req.query.token || req.headers['x-access-token'];
+
+    console.log(token);
+
+    const data = await authService.refreshToken(token);
+
+    console.log(data);
+
+    if(!data){
+      return res.status(403).json({message: "usuário não encontrado"});
+    }
+    return res.status(200).json(data);
+  }
+  catch (error) {
+    console.log(error);
+    res.status(500).send({
+      message: 'Falha ao processar sua requisição'
+    });
+  }
+});
+
 // Função para pegar as famílias
 router.get('/familia', async (req, res) => {
   try {
